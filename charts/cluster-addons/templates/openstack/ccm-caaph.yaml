@@ -1,0 +1,37 @@
+{{- if and .Values.openstack.enabled_caaph .Values.openstack.ccm.enabled }}
+---
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: {{ include "cluster-addons.componentName" (list . "ccm-openstack") }}
+  labels: {{ include "cluster-addons.componentLabels" (list . "ccm-openstack") | nindent 4 }}
+  annotations:
+    # Tell Argo to ignore the non-controller owner references for this object
+    argocd.argoproj.io/sync-options: "ControllerReferencesOnly=true"
+spec:
+  clusterName: {{ include "cluster-addons.clusterName" . }}
+  repoURL: {{ .Values.openstack.ccm.chart.repo }}
+  chartName: {{ .Values.openstack.ccm.chart.name }}
+  version: {{ .Values.openstack.ccm.chart.version }}
+  namespace: {{ .Values.openstack.targetNamespace }}
+  releaseName: ccm-openstack
+  valuesTemplate: |
+    image:
+      repository: {{ include "cluster-addons.imagePrefix" . }}docker.io/k8scloudprovider/openstack-cloud-controller-manager
+    secret:
+      create: false
+    cluster:
+      name: {{ include "cluster-addons.clusterName" . }}
+    controllerExtraArgs: |-
+      - --use-service-account-credentials=false
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: ""
+    tolerations:
+      - key: node.cloudprovider.kubernetes.io/uninitialized
+        value: "true"
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+{{- end }}

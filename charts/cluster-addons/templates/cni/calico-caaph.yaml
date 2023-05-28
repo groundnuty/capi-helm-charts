@@ -1,0 +1,43 @@
+{{- if and .Values.cni.enabled (eq .Values.cni.type "calico-caaph") }}
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: {{ include "cluster-addons.componentName" (list . "cni-calico") }}
+  labels: {{ include "cluster-addons.componentLabels" (list . "cni-calico") | nindent 4 }}
+  annotations:
+    # Tell Argo to ignore the non-controller owner references for this object
+    argocd.argoproj.io/sync-options: "ControllerReferencesOnly=true"
+spec:
+  clusterSelector:
+  # Target workload clusters with specific labels.
+  #  matchLabels:
+  #    calicoCNI: enabled
+  # Target all workload clusters.
+  #  matchLabels: {}
+    capi.stackhpc.com/cluster: orzech-cluster
+  clusterName: {{ include "cluster-addons.clusterName" . }}
+  bootstrap: true
+  repoURL: {{ .Values.cni.calico.chart.repo }}
+  chartName: {{ .Values.cni.calico.chart.name }}
+  version: {{ .Values.cni.calico.chart.version }}
+  namespace: {{ .Values.cni.calico.release.namespace }}
+  releaseName: cni-calico
+  valuesTemplate: |
+    tigeraOperator:
+      registry: {{ include "cluster-addons.imagePrefix" . }}quay.io
+    installation:
+      registry: {{ include "cluster-addons.imagePrefix" . }}docker.io/
+      nodeMetricsPort: 9091
+      typhaMetricsPort: 9093
+      calicoNetwork:
+        bgp: Disabled
+        nodeAddressAutodetectionV4:
+          kubernetes: NodeInternalIP
+        ipPools:{{`{{range $i, $cidr := .Cluster.spec.clusterNetwork.pods.cidrBlocks }}`}}
+          - blockSize: 26
+            cidr: {{`{{ $cidr }}`}}
+            disableBGPExport: false
+            encapsulation: VXLAN
+            natOutgoing: Enabled
+            nodeSelector: all(){{`{{end}}`}}
+{{- end }}

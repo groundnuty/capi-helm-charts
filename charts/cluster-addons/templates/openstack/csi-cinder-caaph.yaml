@@ -1,0 +1,87 @@
+{{- if and .Values.openstack.enabled_caaph .Values.openstack.csiCinder.enabled }}
+---
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: {{ include "cluster-addons.componentName" (list . "csi-cinder") }}
+  labels: {{ include "cluster-addons.componentLabels" (list . "csi-cinder") | nindent 4 }}
+  annotations:
+    # Tell Argo to ignore the non-controller owner references for this object
+    argocd.argoproj.io/sync-options: "ControllerReferencesOnly=true"
+spec:
+  clusterName: {{ include "cluster-addons.clusterName" . }}
+  repoURL: {{ .Values.openstack.csiCinder.chart.repo }}
+  chartName: {{ .Values.openstack.csiCinder.chart.name }}
+  version: {{ .Values.openstack.csiCinder.chart.version }}
+  namespace: {{ .Values.openstack.targetNamespace }}
+  releaseName: csi-cinder
+  valuesTemplate: |
+    csi:
+      attacher:
+        image:
+          repository: {{ include "cluster-addons.imagePrefix" . }}k8s.gcr.io/sig-storage/csi-attacher
+      provisioner:
+        image:
+          repository: {{ include "cluster-addons.imagePrefix" . }}k8s.gcr.io/sig-storage/csi-provisioner
+      snapshotter:
+        image:
+          repository: {{ include "cluster-addons.imagePrefix" . }}k8s.gcr.io/sig-storage/csi-snapshotter
+      resizer:
+        image:
+          repository: {{ include "cluster-addons.imagePrefix" . }}k8s.gcr.io/sig-storage/csi-resizer
+      livenessprobe:
+        image:
+          repository: {{ include "cluster-addons.imagePrefix" . }}k8s.gcr.io/sig-storage/livenessprobe
+      nodeDriverRegistrar:
+        image:
+          repository: {{ include "cluster-addons.imagePrefix" . }}k8s.gcr.io/sig-storage/csi-node-driver-registrar
+      plugin:
+        image:
+          repository: {{ include "cluster-addons.imagePrefix" . }}docker.io/k8scloudprovider/cinder-csi-plugin
+        # This has to be non-empty or the chart fails to render
+        volumes:
+          - name: cacert
+            emptyDir: {}
+        volumeMounts:
+          - name: cloud-config
+            mountPath: /etc/config
+            readOnly: true
+          - name: cloud-config
+            mountPath: /etc/kubernetes
+            readOnly: true
+      snapshotController:
+        image:
+          repository: {{ include "cluster-addons.imagePrefix" . }}k8s.gcr.io/sig-storage/snapshot-controller
+    secret:
+      enabled: true
+      create: false
+      name: cloud-config
+    clusterID: {{ include "cluster-addons.clusterName" . }}
+    storageClass:
+      enabled: false
+      {{- if .Values.openstack.csiCinder.storageClass.enabled }}
+      custom: |-
+        {{- with .Values.openstack.csiCinder.storageClass }}
+        apiVersion: storage.k8s.io/v1
+        kind: StorageClass
+        metadata:
+          name: {{ .name }}
+          {{- if .isDefault }}
+          annotations:
+            storageclass.kubernetes.io/is-default-class: "true"
+          {{- end }}
+        provisioner: cinder.csi.openstack.org
+        parameters:
+          availability: {{ .availabilityZone }}
+          {{- with .volumeType }}
+          type: {{ . }}
+          {{- end }}
+        reclaimPolicy: {{ .reclaimPolicy }}
+        allowVolumeExpansion: {{ .allowVolumeExpansion }}
+        volumeBindingMode: WaitForFirstConsumer
+        {{- with .allowedTopologies }}
+        allowedTopologies: {{ toYaml . | nindent 6 }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+{{- end }}
