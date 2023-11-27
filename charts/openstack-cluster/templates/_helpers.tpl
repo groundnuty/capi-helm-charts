@@ -67,8 +67,8 @@ Labels for component-level resources
 Name of the secret containing the cloud credentials.
 */}}
 {{- define "openstack-cluster.cloudCredentialsSecretName" -}}
-{{- if .Values.cloudCredentialsSecretName -}}
-{{- .Values.cloudCredentialsSecretName -}}
+{{- if .Values.global.cloudCredentialsSecretName -}}
+{{- .Values.global.cloudCredentialsSecretName -}}
 {{- else -}}
 {{ include "openstack-cluster.componentName" (list . "cloud-credentials") -}}
 {{- end -}}

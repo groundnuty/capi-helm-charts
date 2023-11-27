@@ -1,16 +1,16 @@
 ---
+global:
+  # The name of an existing secret containing a clouds.yaml and optional cacert
+  cloudCredentialsSecretName:
+  # OR
+  # Content for the clouds.yaml file
+  # Having this as a top-level item allows a clouds.yaml file from OpenStack to be used as a values file
+  clouds: {}
+  # The PEM-encoded CA certificate for the specified cloud
+  cloudCACert:
 
-# The name of an existing secret containing a clouds.yaml and optional cacert
-cloudCredentialsSecretName:
-# OR
-# Content for the clouds.yaml file
-# Having this as a top-level item allows a clouds.yaml file from OpenStack to be used as a values file
-clouds:
-# The PEM-encoded CA certificate for the specified cloud
-cloudCACert:
-
-# The name of the cloud to use from the specified clouds.yaml
-cloudName: openstack
+  # The name of the cloud to use from the specified clouds.yaml
+  cloudName: openstack
 
 # The Kubernetes version of the cluster
 # This should match the version of kubelet and kubeadm in the image

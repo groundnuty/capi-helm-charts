@@ -78,6 +78,13 @@ openstack:
       name: openstack-cloud-controller-manager
       version: 2.28.3
     values: {}
+  secret:
+    enabled: true
+    chart:
+      repo: https://ameijer.github.io/k8s-as-helm
+      name: secret
+      version: 1.0.4
+    values: {}
   # Settings for the Cinder CSI plugin
   csiCinder:
     # Indicates if the Cinder CSI should be enabled
