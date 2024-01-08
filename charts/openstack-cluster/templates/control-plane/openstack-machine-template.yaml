@@ -7,7 +7,11 @@ template:
   spec:
     identityRef:
       kind: Secret
+      {{- if .Values.controlPlane.cloudCredentialsSecretName }}
+      name: {{ .Values.controlPlane.cloudCredentialsSecretName }}
+      {{- else }}
       name: {{ include "openstack-cluster.cloudCredentialsSecretName" . }}
+      {{- end }}
     cloudName: openstack
     flavor: {{ .Values.controlPlane.machineFlavor | required ".Values.controlPlane.machineFlavor is required" }}
     {{- with .Values.machineSSHKeyName }}

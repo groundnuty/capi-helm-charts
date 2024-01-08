@@ -142,6 +142,9 @@ controlPlane:
   machineCount: 3
   # The kubernetes version for the control plane
   kubernetesVersion:
+  # The name of an existing secret containing a clouds.yaml and optional cacert
+  # Used for creation of control plane only
+  cloudCredentialsSecretName:
   # The image to use for control plane
   machineImage:
   # The ID of the image to use for the control plane
