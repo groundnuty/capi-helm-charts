@@ -14,8 +14,10 @@ template:
       {{- end }}
     cloudName: openstack
     flavor: {{ .Values.controlPlane.machineFlavor | required ".Values.controlPlane.machineFlavor is required" }}
-    {{- with .Values.machineSSHKeyName }}
-    sshKeyName: {{ . }}
+    {{- if .Values.controlPlane.machineSSHKeyName }}
+    sshKeyName: {{ .Values.controlPlane.machineSSHKeyName }}
+    {{- else }}
+    sshKeyName: {{ .Values.machineSSHKeyName }}
     {{- end }}
     {{- if .Values.controlPlane.machineRootVolume.diskSize }}
     rootVolume: {{ toYaml .Values.controlPlane.machineRootVolume | nindent 6 }}

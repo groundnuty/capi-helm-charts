@@ -149,6 +149,9 @@ controlPlane:
   machineImage:
   # The ID of the image to use for the control plane
   machineImageId:
+  # The name of the SSH key to inject into cluster control plane machines
+  # Overrides the global SSH key name
+  machineSSHKeyName:
   # The flavor to use for control plane machines
   machineFlavor:
   # The ports for control plane nodes
