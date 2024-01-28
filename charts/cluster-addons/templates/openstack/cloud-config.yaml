@@ -7,7 +7,8 @@ metadata:
   labels: {{ include "cluster-addons.componentLabels" (list . "cloud-config") | nindent 4 }}
   annotations:
     # Tell Argo to ignore the non-controller owner references for this object
-    argocd.argoproj.io/sync-options: "ControllerReferencesOnly=true"
+    # Avoid 262144 bytes limit on annotations when embeding a long cacert chain
+    argocd.argoproj.io/sync-options: "ControllerReferencesOnly=true,ServerSideApply=true"
 spec:
   repoURL: {{ .Values.openstack.secret.chart.repo }}
   chartName: {{ .Values.openstack.secret.chart.name }}
