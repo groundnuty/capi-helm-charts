@@ -24,7 +24,7 @@ spec:
       clouds.yaml: |
         clouds:
           openstack:
-            {{ index . $.Values.global.cloudName | toYaml | indent 12 | trim }}
+            {{ index . $.Values.global.CCMCloudName | toYaml | indent 12 | trim }}
     {{- end }}
     {{- with .Values.global.cloudCACert  }}
       cacert: {{ . | toYaml | indent 6 | trim }}
