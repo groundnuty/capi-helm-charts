@@ -11,6 +11,7 @@ global:
 
   # The name of the cloud to use from the specified clouds.yaml
   cloudName: openstack
+  CCMCloudName: k8s-operator
 
 # The Kubernetes version of the cluster
 # This should match the version of kubelet and kubeadm in the image
