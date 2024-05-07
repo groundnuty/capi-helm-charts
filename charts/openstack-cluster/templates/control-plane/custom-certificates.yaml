@@ -1,0 +1,15 @@
+{{- range $name, $certs := .Values.customCertificates }}
+{{- if (and $certs.key $certs.crt) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "openstack-cluster.clusterName" $ }}-{{ $name }}
+  labels:
+    cluster.x-k8s.io/cluster-name: {{ include "openstack-cluster.clusterName" $ }}
+    {{- include "openstack-cluster.componentLabels" (list $ "ca") | nindent 4 }}
+data:
+  tls.crt: {{ $certs.crt | b64enc }}
+  tls.key: {{ $certs.key | b64enc }}
+type: kubernetes.io/tls
+{{- end}}
+{{- end}}

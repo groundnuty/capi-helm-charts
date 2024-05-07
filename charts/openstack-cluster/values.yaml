@@ -92,6 +92,21 @@ trustedCAs: {}
   #   ...certificate data...
   #   -----END CERTIFICATE-----
 
+# TODO: add comments
+customCertificates:
+  ca:
+    crt:
+    key:
+  etcd:
+    crt:
+    key:
+  proxy:
+    crt:
+    key:
+  sa:
+    crt:
+    key:
+
 # List of additional packages to install on cluster nodes
 additionalPackages: []
   # - nfs-common
