@@ -199,7 +199,7 @@ controlPlane:
         name: '{{ local_hostname }}'
         kubeletExtraArgs:
           cloud-provider: external
-          provider-id: '{{ instance_id }}'
+          provider-id: openstack:///'{{ instance_id }}'
     # As well as enabling an external cloud provider, we set the bind addresses for the
     # etcd metrics, controller-manager, scheduler and kube-proxy to 0.0.0.0 so that Prometheus
     # can reach them to collect metrics
@@ -223,7 +223,7 @@ controlPlane:
         name: '{{ local_hostname }}'
         kubeletExtraArgs:
           cloud-provider: external
-          provider-id: '{{ instance_id }}'
+          provider-id: openstack:///'{{ instance_id }}'
     kubeProxyConfiguration:
       metricsBindAddress: 0.0.0.0:10249
   # The machine health check for auto-healing of the control plane
