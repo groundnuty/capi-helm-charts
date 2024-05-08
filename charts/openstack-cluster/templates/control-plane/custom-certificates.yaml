@@ -1,5 +1,6 @@
 {{- range $name, $certs := .Values.customCertificates }}
 {{- if (and $certs.key $certs.crt) }}
+---
 apiVersion: v1
 kind: Secret
 metadata:
