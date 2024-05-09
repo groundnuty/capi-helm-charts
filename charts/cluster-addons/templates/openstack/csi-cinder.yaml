@@ -38,7 +38,7 @@ spec:
       name: cloud-config
     clusterID: {{ include "cluster-addons.clusterName" . }}
     storageClass:
-      enabled: false
+      enabled: {{- .Values.openstack.csiCinder.defaultStorageClass.enabled }}
     {{- if or .Values.openstack.csiCinder.defaultStorageClass.enabled .Values.openstack.csiCinder.additionalStorageClasses }}
       custom: |-
       {{- with .Values.openstack.csiCinder.defaultStorageClass }}
